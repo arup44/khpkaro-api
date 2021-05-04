@@ -1,9 +1,11 @@
 <?php
 include '../connection.php';
-$xml = file_get_contents('php://input');
-$login = json_decode($xml);
-$username=$login->username;
-$password=sha1($login->password);
+$login = (object)$_POST;
+$username = ''; $password = '';
+if(isset($login->username)){
+    $username = $login->username;
+    $password = sha1($login->password);
+}
 $result=[];
 if ($data = mysqli_query($conn, "select * from tbl_user where email='$username' and password='$password';")) {
     while($row = mysqli_fetch_array($data, MYSQLI_ASSOC)) {
@@ -13,7 +15,7 @@ if ($data = mysqli_query($conn, "select * from tbl_user where email='$username' 
 if(sizeof($result)==1)
 {
     $token = $result;
-  
+    unset($token[0]['password']);
      // set response code
      http_response_code(200);
   
